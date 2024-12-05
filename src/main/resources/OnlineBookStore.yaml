@@ -1,0 +1,203 @@
+openapi: 3.0.3
+info:
+  title: Online Bookstore API
+  description: API documentation for an online bookstore
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+
+paths:
+  /login:
+    post:
+      summary: User login
+      description: Logs in a user with their credentials
+      operationId: login
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+               $ref: '#/components/schemas/UserLoginRequest'
+      responses:
+        '200':
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+        '400':
+          description: Bad request (Invalid credentials)
+        '401':
+          description: Unauthorized (Invalid email or password)
+
+  /register:
+    post:
+      summary: User registration
+      description: Registers a new user in the system
+      operationId: register
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+      responses:
+        '201':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+        '400':
+          description: Bad request (Missing or invalid data)
+
+  /books:
+    get:
+      summary: Get all books
+      description: Fetches a list of all books in the store
+      operationId: getAllBooks
+      tags:
+        - Books
+      responses:
+        '200':
+          description: A list of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    bookId:
+                      type: integer
+                      example: 1
+                    title:
+                      type: string
+                      example: "The Great Gatsby"
+                    author:
+                      type: string
+                      example: "F. Scott Fitzgerald"
+                    price:
+                      type: number
+                      format: float
+                      example: 10.99
+        '500':
+          description: Internal server error
+
+  /cart/updateCart:
+    post:
+      summary: Update shopping cart
+      description: Updates the contents of the shopping cart
+      operationId: updateCart
+      tags:
+        - Cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartRequest'
+      responses:
+        '200':
+          description: Shopping cart updated successfully
+        '400':
+          description: Bad request (Invalid book ID or quantity)
+
+  /cart:
+    get:
+      summary: Get all books in the cart
+      description: Fetches a list of all books in the cart
+      operationId: getCartItems
+      tags:
+        - Books
+      responses:
+        '201':
+          description: Order successfully placed
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/CartResponse'
+        '400':
+          description: Bad request (Invalid order data)
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    UserLoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        password:
+          type: string
+    
+    UserLoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        validResponse:
+          type: boolean
+          
+    BookRequest:
+      type: object
+      properties:
+        bookId:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
+    
+    CartResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        book:
+          $ref: '#/components/schemas/BookDetails'
+        quantity :
+          type: integer
+          
+    CartRequest:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BookRequest'
+        ordered:
+          type: boolean
+          
+    BookDetails:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        author:
+          type: string
+        price:
+          type: number
+          format: double
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: integer
